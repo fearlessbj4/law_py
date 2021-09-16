@@ -1,7 +1,9 @@
+from section_cut import find_after,search_from_list
+
 number_zh=["零","壹","貳","參","肆","伍","陸","柒","捌","玖","拾","佰","仟","萬","一","二","三","四","五","六","七","八","九","十"]
 number_int=["0","1","2","3","4","5","6","7","8","9"]
 number_int_full=["０","１","２","３","４","５","６","７","８","９"]
-
+number_all=number_zh+number_int+number_int_full
 
 def number_only(target,the_list):
 	for char_i in range(len(target)):
@@ -13,7 +15,7 @@ def number_only(target,the_list):
 			target=target[:char_i]+"r"+target[char_i+1:]
 
 	target=target.replace("r","")
-	return target
+	return int(target)
 
 def pre_calculator(target):
 	if(target.find("零")!=-1):
@@ -108,12 +110,49 @@ def number_k_switch(sum):
 #t1="1009萬0020元"
 #t1="壹仟零玖萬零貳拾元"
 def enter(t1):
+	sum=0
+	if(find_after(t1,"元","元")!=-1):
+		t1_t=t1
+		while (t1_t.find("元")!=-1):
+			t1_h=t1_t[:t1_t.find("元")+1]
+			t1_t=t1_t[t1_t.find("元")+1:]
+			sum+=int(main(t1_h).replace(",",""))
+		return sum
+	else:
+		sum+=int(main(t1).replace(",",""))
+		return sum
+
+def pre(t1):
+	t1=t1.replace(",","")
+	anchor_char="元"
+	ed=t1.find("元")#should equal to len(t1)-1
+	st=ed+1
+	for i in range(ed-1,-1,-1):
+		if(search_from_list(number_all,t1[i])!=-1):
+			st=i
+		else:
+			break
+	return t1[st:ed+1]
+
+
+
+def main(t1):
+	t1=pre(t1)
 	if(t1.find("0")!=-1 or t1.find("1")!=-1 or t1.find("2")!=-1 or t1.find("3")!=-1 or t1.find("4")!=-1 
 		or t1.find("5")!=-1 or t1.find("6")!=-1 or t1.find("7")!=-1 or t1.find("8")!=-1 or t1.find("9")!=-1):
 				#sum_str=number_k_switch(t.replace(",","").replace("萬","").replace("元",""))
-		t1=number_only(t1,number_int)
+		#t1=t1.replace("萬","0000")
+		#t1=t1.replace("仟","千").replace("千","000")
+		if(t1.find("萬")!=-1):
+			if(len(t1[t1.find("萬"):t1.find("元")])>1):
+				t1=str(number_only(t1[:t1.find("萬")+1].replace("萬","0000"),number_int)+number_only(t1[t1.find("萬")+1:],number_int))
+			else:
+				t1=str(number_only(t1.replace("萬","0000"),number_int))
+		else:
+			t1=number_only(t1,number_int)
 		#print(t1)
 		#print(number_k_switch(t1))
+
 		return number_k_switch(t1)
 	else:
 		t1=pre_calculator(t1)

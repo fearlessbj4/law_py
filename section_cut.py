@@ -33,9 +33,30 @@ def cut(lst,mode,start_point,mid_point,end_point,start_list,mid_list,end_list):
 		return r_lst
 
 def find_after(lst,anchor_keyward,the_keyward):
-	if(lst[lst.find(anchor_keyward):].find(the_keyward)==-1):
+	if(lst[lst.find(anchor_keyward)+len(anchor_keyward):].find(the_keyward)<=-1):
 		return int(-1)
 
 	else:
-		return int(lst.find(anchor_keyward)+lst[lst.find(anchor_keyward):].find(the_keyward))
+		return int(lst.find(anchor_keyward)+len(anchor_keyward)+lst[lst.find(anchor_keyward)+len(anchor_keyward):].find(the_keyward))
 
+def search_from_list(lst,target):
+	flag=-1
+	for i in range(len(lst)):
+		if(target==lst[i]):
+			flag=i
+			break
+	return flag
+def find_from_list(lst,target):
+	flag=-1
+	for i in range(len(lst)):
+		if(target.find(lst[i])!=-1):
+			flag=i
+			break
+	return flag
+	
+def find_all_from_list(lst,target):
+	flag=[]
+	for i in range(len(lst)):
+		if(target.find(lst[i])!=-1):
+			flag.append(i)
+	return flag
