@@ -131,10 +131,16 @@ def enter(t1,e):
 		while (t1_t.find(element_char)!=-1):
 			t1_h=t1_t[:t1_t.find(element_char)+1]
 			t1_t=t1_t[t1_t.find(element_char)+1:]
-			sum+=int(main(t1_h).replace(",",""))
+			if(int(main(t1_h).replace(",",""))==-1):
+				sum+=0
+			else:
+				sum+=int(main(t1_h).replace(",",""))
 		return sum
 	else:
-		sum+=int(main(t1).replace(",",""))
+		if(int(main(t1).replace(",",""))==-1):
+			sum+=0
+		else:
+			sum+=int(main(t1).replace(",",""))
 		return sum
 
 def pre(t1):
