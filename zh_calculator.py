@@ -2,11 +2,13 @@ from section_cut import find_after,search_from_list
 
 element_char="元"#init_
 
-number_zh=["零","壹","貳","參","肆","伍","陸","柒","捌","玖","拾","佰","仟","萬","一","二","三","四","五","六","七","八","九","十"]
+number_zh=["零","壹","貳","參","肆","伍","陸","柒","捌","玖","拾","佰","仟","萬","〇","一","二","三","四","五","六","七","八","九","十","百","千"]
 number_int=["0","1","2","3","4","5","6","7","8","9"]
 number_int_full=["０","１","２","３","４","５","６","７","８","９"]
 number_all=number_zh+number_int+number_int_full
 
+full_offset=number_zh.index("仟")-number_zh.index("零")
+offset=number_zh.index("一")-number_zh.index("壹")
 def is_number(target):
 	global number_all
 	if(number_all.count(target)!=0):
@@ -144,9 +146,17 @@ def enter(t1,e):
 		return sum
 
 def pre(t1):
+	global number_zh
+
+	for i in range(full_offset):
+		if(t1.find(number_zh[i+offset])!=-1):
+			t1=t1.replace(number_zh[i+offset],number_zh[i])
+			
+	
 	t1=t1.replace("\r\n"," ")
 	t1=t1.replace(" ","")
 	t1=t1.replace("千","仟")
+	t1=t1.replace("百","佰")
 	if(t1.find("拾")!=-1):
 		
 		if(search_from_list(number_zh,t1[t1.find("拾")-1])==-1):
