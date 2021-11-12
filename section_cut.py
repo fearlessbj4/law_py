@@ -39,6 +39,20 @@ def find_after(lst,anchor_keyward,the_keyward):
 	else:
 		return int(lst.find(anchor_keyward)+len(anchor_keyward)+lst[lst.find(anchor_keyward)+len(anchor_keyward):].find(the_keyward))
 
+def find_context(lst,anchor_keyward,the_keyward,offset):
+	if(lst.find(anchor_keyward)!=-1 and lst.find(the_keyward)!=-1):
+		st=(lst.find(anchor_keyward)-offset)
+		ed=(lst.find(anchor_keyward)+offset)
+		st=st if st>=0 else 0
+		ed=ed if ed<=(len(lst)-1) else len(lst)-1
+		if(lst[st:ed].find(the_keyward)!=-1):
+			return int(st+lst[st:ed].find(the_keyward))
+		else:
+			return int(-1)
+
+	else:
+		return int(-1)
+
 def search_from_list(lst,target):
 	flag=-1
 	for i in range(len(lst)):
@@ -46,13 +60,13 @@ def search_from_list(lst,target):
 			flag=i
 			break
 	return flag
-def find_from_list(lst,target):
+def find_from_list(target,lst):
 	flag=-1
 	for i in range(len(lst)):
 		if(target.find(lst[i])!=-1):
 			flag=i
 			break
-	return flag
+	return int(flag)
 	
 def find_all_from_list(lst,target):
 	flag=[]
