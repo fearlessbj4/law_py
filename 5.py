@@ -6,7 +6,7 @@ import random
 from pprint import pprint
 import colorama
 from colorama import Fore, Style
-from section_cut import cut,find_after,find_from_list,search_from_list
+from section_cut import cut,find_after,find_from_list,search_from_list,find_context
 import zh_calculator as cal
 
 
@@ -23,10 +23,11 @@ list_c=[i.replace("\n","") if i.find("\n")!=-1 else i for i in list_c]
 #"""
 累犯=["竊盜前科","竊盜之前科","竊盜之前案","累犯"]
 學歷=["智識程度","學歷","教育"]
+經濟=["經濟","家庭狀況","生活狀況"]
 #"""
 start_point="主  文\r\n"
-mid_list=["犯 罪 事 實 及 理 由\r\n","事實及理由\r\n","    事實及理由\r\n","  理  由\r\n","理    由\r\n","    事實及理由\r\n","    事實理由及證據\r\n","    事 實 理 由 及 證 據\r\n","事實理由及證據\r\n","事實及證據理由\r\n","理      由\r\n","  "]
-start_list=["主  文\r\n","主    文\r\n","主　 文\r\n","主      文\r\n","    主　　　文\r\n","    主　　文\r\n","     文\r\n"]
+mid_list=["犯 罪 事 實 及 理 由\r\n","犯罪事實","犯 罪 事 實 及 理 由","事實及理由\r\n","    事實及理由\r\n","  理  由\r\n","理    由\r\n","    事實及理由\r\n","    事實理由及證據\r\n","    事 實 理 由 及 證 據\r\n","事實理由及證據\r\n","事實及證據理由\r\n","理      由\r\n","  "]
+start_list=["主  文\r\n","主    文\r\n","主　 文\r\n","主      文\r\n","    主　　　文\r\n","    主　　文\r\n","     文\r\n","主  文"]
 #end_point="    理  由\r\n"
 mid_point="    事實及理由\r\n"
 end_point="中    華    民    國"
@@ -47,13 +48,15 @@ ct6=0
 ct7=0
 ct8=0
 ct9=0
+ct10=0
 
-#dlist=os.popen("ls ../law_py/202011").readlines()
+
 k=0
 output=[]#[[title,stuff,stuff_type,stuff_value]]
 simple_output=[]
 small_output=[]
 total_price=0
+t_=[]
 
 tp_str=""
 output_str=""
@@ -71,12 +74,12 @@ def fc(title,lst,st,ed,s_char):
 	find_stuff(title,p_string,st,ed,int(len(keyward)),0,list(cal.number_int+cal.number_int_full))
 	
 	if(find_after(lst,st,st)!=-1):
-		#print("!#!")
+		
 		fc(title,lst[find_after(lst,st,st):],st,ed,s_char)
 	else:
 		return 1
 
-	#print(p_string)	
+		
 def find_value(lst):
 	return cal.enter(lst)
 def find_stuff_type(lst):
@@ -99,7 +102,7 @@ def find_stuff(title,lst,st,ed,offset_st,offset_ed,num_list):
 	
 	tp_str=str(lst[lst.find(st):lst.find(st)+offset_st])
 	output_str+=tp_str
-	#print(tp_str)
+	
 
 	key_char="價值"
 	for i in range(1,len(key_char_list),1):
@@ -112,48 +115,46 @@ def find_stuff(title,lst,st,ed,offset_st,offset_ed,num_list):
 		t=lst[lst.find(st)+offset_st:lst.find(ed)+offset_ed]
 		tp_str=str(Fore.WHITE+t[:t.find(key_char)]+Fore.WHITE+key_char+Fore.WHITE+t[t.find(key_char)+len(key_char):])
 		output_str+="\n"+tp_str
-		#print(tp_str)
+		
 		content=t[t.find(key_char)+1:]
-		#output.append([title,content,0,0])
+		
 		tp_str=str(Style.RESET_ALL)
 		output_str+="\n"+tp_str
-		#print(tp_str)
+		
 		tp_str="==================＄==================="
 		output_str+="\n"+tp_str
-		#print(tp_str)
+		
 		a=cal.enter(content.replace(" ",""),"元")
 		tp_str=str(Fore.WHITE+str(a))
 		output_str+="\n"+tp_str
-		#print(tp_str)
+		
 		tp_str=str(Style.RESET_ALL)
 		output_str+="\n"+tp_str
-		#print(tp_str)
+		
 		tp_str="======================================"
 		output_str+="\n"+tp_str
-		#print(tp_str)
+		
 		total_price+=(a if a!=-1 else 0)
-		#output.append([title,content,find_stuff_type(content),find_value(content)])
+		
 	else:
 		tp_str=str(Fore.WHITE+lst[lst.find(st)+offset_st:lst.find(ed)+offset_ed])
 		output_str+="\n"+tp_str
-		#print(tp_str)
+		
 	
 	tp_str=str(Style.RESET_ALL)
 	output_str+="\n"+tp_str
-	#print(tp_str)
+	
 	tp_str=str(lst[lst.find(ed)+offset_ed:])
 	output_str+="\n"+tp_str
-	#print(tp_str)
+	
 	return 1
 	
 str_ii=""
 s=str("./target_case")
 flist=os.popen("ls "+s).readlines()
-#print(flist)
+
 for doc in flist:
-	#if(ct<0):
-	#	print(doc)
-	#	ct+=1
+	
 	if (doc[:-1].endswith(".json")):
 		file = json.load(open(s+"/"+doc[:-1],"r"))
 		if (file['JCASE'].find("簡")!=-1 and file['JFULL'].find("犯竊盜罪")!=-1 and file['JFULL'].find("犯罪事實")!=-1 
@@ -164,21 +165,9 @@ for doc in flist:
 			output_str=""
 			ct1+=1
 			
-			#if(file['JFULL'].find("准予賠償")!=-1):
-			#int(len(file['JFULL'])*0.5):]		
-			
-			#print(file['JID'])
 			
 			file['JFULL']=file['JFULL'].replace("叁","參").replace("十","拾").replace("\r\n    ","")
 
-
-			
-			#if(len(cut_full)>=0):
-				
-
-			
-				#print(cut_full)
-				#file['JFULL'][file['JFULL'].find("犯罪事實"):].find("\r\n")
 			
 
 			if(file['JFULL'].find("報告偵辦")!=-1):
@@ -191,7 +180,7 @@ for doc in flist:
 				print_str=file['JFULL'][file['JFULL'].find("犯罪事實\r\n"):find_after(file['JFULL'],"犯罪事實\r\n","二、")+2]
 			
 			total_price=0
-			#and random.randint(0,99)%100==17
+			
 			if(len(print_str)>=20):	
 				total_price=0
 				p_str=cut(file['JFULL'],"short",start_point,mid_point,end_point,start_list,mid_list,end_list)
@@ -209,7 +198,7 @@ for doc in flist:
 				if(find_after(p_str,"易科罰金","易科罰金")!=-1 and p_str.find("應執行")!=-1):
 					p_str=p_str[p_str.find("應執行"):find_after(p_str,"應執行","，")]
 				if(j1!=-1):
-					#print(p_str[:p_str.find("易科罰金")])
+					
 					if(p_str.find("易科罰金")!=-1):
 						y=cal.enter(p_str[:p_str.find("易科罰金")],"年")
 						m=cal.enter(p_str[:p_str.find("易科罰金")],"月")
@@ -218,30 +207,27 @@ for doc in flist:
 						y=cal.enter(p_str,"年")
 						m=cal.enter(p_str,"月")
 						d=cal.enter(p_str,"日")
-					#
 					
-					#
 				if(j2!=-1):
-					#print("罰金")
+					
 					if(p_str.find("易服勞役")!=-1):
 						
 						
 						f_p_str=p_str[:p_str.find("易服勞役")]
 						
 						fine=cal.enter(f_p_str[find_after(f_p_str,"罰金","應執行"):],"元")
-						#print(f_p_str[find_after(f_p_str,"罰金","應執行"):])
+						
 						
 					else:
 						fine=cal.enter(p_str,"元")
 						
 					
-					#print(fine)
+					
 				
 				ct3+=1
 				p1=total_price
 				p2=(m if m!=-1 else 0)*30*1000+(d if d!=-1 else 0)*1000+(fine if fine!=-1 else 0)
-				#print("涉案金額:",p1)
-				#print("換算罰金:",p2)
+				
 				total_price=0
 				if(file['JFULL'].find("爰")!=-1 and find_after(file['JFULL'],"爰","被告")!=-1):
 					ct5+=1
@@ -250,105 +236,103 @@ for doc in flist:
 					small_str=""
 					small_str+=str(Fore.BLUE)+"-----------"+str(ct4)+"------------\n"+str(Style.RESET_ALL)
 
-					#print("-----------"+str(ct4)+"------------")
+					
 					small_str+=str(file['JID'])+"\n"
-					#print(file['JID'])
+					
 					small_str+="-----------------------\n"
-					#print("-----------------------\n")
+					
 					small_str+="=================事實理由=================\n"
-					#print("=================事實理由=================")
+					
 					small_str+=p_str+"\n"
-					#print(p_str)				
-					#print("----------------------------------------")
 					
 					tp_str=""
 					output_str=""
-					#print(fc(file['JID'],print_str,keyward,"得手","。"))
+					
 
 					tp_str=""
 					output_str=""
-					#print("===================科刑==================")
-					#print(file['JFULL'].find("爰"))
-					#print("====================刑===================")
 					
-					#print("年")
-					#print(y)
-					#print("月")
-					#print(m)
-					#print("日")
-					#print(d)
-					#print("罰金")
-					#if(p_str.find("易服勞役")!=-1):
-					#	print(f_p_str[find_after(f_p_str,"罰金","應執行"):])
-
-					#print(fine)
 					small_str+="==================細節==================\n"
 					small_str+=tp_output_str+"\n"
 
 					small_str+="涉案金額:"+str(Fore.WHITE)+str(p1)+"\n"
-					#print("涉案金額:"+Fore.WHITE+str(p1))
-					small_str+=str(Style.RESET_ALL)+"\n"
-					#print(Style.RESET_ALL)
 					
-					#find_after(file['JFULL'],"坦承","之刑")!=-1
+					small_str+=str(Style.RESET_ALL)+"\n"
+					
+					
+					
 					if(find_after(file['JFULL'],"坦承","所示之刑")!=-1):
-						
+						t_=[]
 						ct8+=1
-					"""
-					if(file['JFULL'].find("加重其刑")!=-1):
-						print(file['JID'])
-						ct9+=1
-					#"""
-					#"""
-					ver=find_from_list(file['JFULL'],累犯)
-					if(ver!=-1):
-						
-						type_=[]
-						type_.append(find_after(file['JFULL'],"審酌",累犯[ver]))
-						
-						
-						ct9+=1
-					#"""
+					
 					ver=find_from_list(file['JFULL'],學歷)
 					if(ver!=-1):
 						
 						type_=[]
-						type_.append(find_after(file['JFULL'],"大學",學歷[ver]))
-						type_.append(find_after(file['JFULL'],"高職",學歷[ver]))
-						type_.append(find_after(file['JFULL'],"高中",學歷[ver]))
-						type_.append(find_after(file['JFULL'],"國中",學歷[ver]))
-						type_.append(find_after(file['JFULL'],"國小",學歷[ver]))
-						#type_.append(find_after(file['JFULL'],"小學",學歷[ver]))
-						type_.append(find_after(file['JFULL'],"未受教育",學歷[ver]))
-						#type_.append(find_after(file['JFULL'],"高等",學歷[ver]))
+						type_學歷=["大學","高職","高中","國中","國小","小學","未受教育","高等","五專","健全","成熟"]
+						#type_學歷+=["自述","自陳","兼衡"]
+
+						for i in range(len(type_學歷)):
+							
+							type_.append(find_after(file['JFULL'],type_學歷[i],學歷[ver]))
+							type_.append(find_after(file['JFULL'],學歷[ver],type_學歷[i]))
 						
+						
+						"""
+						if(type_.count(-1)!=len(type_)):
+							ct9+=1
+						else:
+							print(file['JID'])
+						#"""
+
+						t_.append(type_)
 						ct7+=1
+					ver=find_from_list(file['JFULL'],經濟)
+					
+					if(ver!=-1):
 
-					if(file['JFULL'].find("經濟")!=-1):
 						type_=[]
-						type_.append(find_after(file['JFULL'],"富裕","經濟"))
-						type_.append(find_after(file['JFULL'],"小康","經濟"))
-						type_.append(find_after(file['JFULL'],"一般","經濟"))
-						type_.append(find_after(file['JFULL'],"普通","經濟"))
-						type_.append(find_after(file['JFULL'],"勉持","經濟"))
-						type_.append(find_after(file['JFULL'],"貧寒","經濟"))
-						type_.append(find_after(file['JFULL'],"清寒","經濟"))
-						type_.append(find_after(file['JFULL'],"貧窮","經濟"))
-						type_.append(find_after(file['JFULL'],"貧困","經濟"))
-						ct6+=1
-						
-					#else:
-						#print(file['JID'])
-						#print(small_str)
+						type_經濟=["富裕","小康","一般","普通","勉持","貧寒","清寒","貧窮","貧困"]
+						type_經濟+=["自述","自陳","兼衡"]
+
+						for i in range(len(type_經濟)):
+							type_.append(find_after(file['JFULL'],type_經濟[i],經濟[ver]))
+							type_.append(find_after(file['JFULL'],經濟[ver],type_經濟[i]))
 						
 
+						#"""
+						if(type_.count(-1)!=len(type_)):
+							ct9+=1
+						else:
+							print(file['JID'])
+						#"""
+
+						ct6+=1
+						t_.append(type_)
+					
+
+					
+					if(len(t_)==2 and (t_[0].count(-1)!=len(t_[0]) and t_[1].count(-1)!=len(t_[1]))):
+						ct10+=1
+						#=========!
+						#print(file['JID'])
+						#print(t_)
+						#=========!
+
+					#if(file['JFULL'].find("身心障礙")!=-1):
+						#	ct10+=1
+					
+					t_=[]
+
+					#print(small_str)
 					small_output.append(small_str)
 					small_str=""
-					#print("換算罰金:",p2)
+					
 
 					ct4+=1
 
 				#"""
+			
 				"""
 				p_str=cut(file['JFULL'],"mid",start_point,mid_point,end_point,start_list,mid_list,end_list)
 				if(cal.enter(p_str,"元")>0):
@@ -370,5 +354,5 @@ f.close()
 					#print(file['JFULL'])
 
 
-print(ct3,ct4,ct5,ct6,ct7,ct8,ct9)
+print(ct3,ct4,ct5,ct6,ct7,ct8,ct9,ct10)
 

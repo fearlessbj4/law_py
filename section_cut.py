@@ -33,7 +33,9 @@ def cut(lst,mode,start_point,mid_point,end_point,start_list,mid_list,end_list):
 		return r_lst
 
 def find_after(lst,anchor_keyward,the_keyward):
-	if(lst[lst.find(anchor_keyward)+len(anchor_keyward):].find(the_keyward)<=-1):
+	if(lst.find(anchor_keyward)==-1 or lst.find(the_keyward)==-1):
+		return int(-1)
+	elif(lst[lst.find(anchor_keyward)+len(anchor_keyward):].find(the_keyward)<=-1):
 		return int(-1)
 
 	else:
@@ -42,7 +44,7 @@ def find_after(lst,anchor_keyward,the_keyward):
 def find_context(lst,anchor_keyward,the_keyward,offset):
 	if(lst.find(anchor_keyward)!=-1 and lst.find(the_keyward)!=-1):
 		st=(lst.find(anchor_keyward)-offset)
-		ed=(lst.find(anchor_keyward)+offset)
+		ed=(lst.find(anchor_keyward)+offset)+len(anchor_keyward)
 		st=st if st>=0 else 0
 		ed=ed if ed<=(len(lst)-1) else len(lst)-1
 		if(lst[st:ed].find(the_keyward)!=-1):
