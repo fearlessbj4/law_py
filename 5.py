@@ -8,6 +8,8 @@ import colorama
 from colorama import Fore, Style
 from section_cut import cut,find_after,find_from_list,search_from_list,find_context
 import zh_calculator as cal
+from ver_5 import *
+from func_5 import *
 
 
 
@@ -19,24 +21,6 @@ list_a=[i.replace("\n","") if i.find("\n")!=-1 else i for i in list_a]
 list_b=[i.replace("\n","") if i.find("\n")!=-1 else i for i in list_c]
 list_c=[i.replace("\n","") if i.find("\n")!=-1 else i for i in list_c]
 #"""
-
-#"""
-累犯=["竊盜前科","竊盜之前科","竊盜之前案","累犯"]
-學歷=["智識程度","學歷","教育"]
-經濟=["經濟","家庭狀況","生活狀況"]
-#"""
-start_point="主  文\r\n"
-mid_list=["犯 罪 事 實 及 理 由\r\n","犯罪事實","犯 罪 事 實 及 理 由","事實及理由\r\n","    事實及理由\r\n","  理  由\r\n","理    由\r\n","    事實及理由\r\n","    事實理由及證據\r\n","    事 實 理 由 及 證 據\r\n","事實理由及證據\r\n","事實及證據理由\r\n","理      由\r\n","  "]
-start_list=["主  文\r\n","主    文\r\n","主　 文\r\n","主      文\r\n","    主　　　文\r\n","    主　　文\r\n","     文\r\n","主  文"]
-#end_point="    理  由\r\n"
-mid_point="    事實及理由\r\n"
-end_point="中    華    民    國"
-end_list=["中    華    民    國","中      華      民      國","中　　華　　民　　國"]   
-print(Style.RESET_ALL)
-#target_keyword=[["所得"]]
-key_char_list=["價值","內","之",",","，"]
-keyward="徒手竊取"
-
 tempc=0
 ct1=0
 ct11=0
@@ -60,10 +44,10 @@ t_=[]
 
 tp_str=""
 output_str=""
-
+#"""
 #def find_num_part(target,pre_offset):
 	
-
+#"""
 def fc(title,lst,st,ed,s_char):
 	
 	
@@ -148,7 +132,7 @@ def find_stuff(title,lst,st,ed,offset_st,offset_ed,num_list):
 	output_str+="\n"+tp_str
 	
 	return 1
-	
+#"""
 str_ii=""
 s=str("./target_case")
 flist=os.popen("ls "+s).readlines()
@@ -269,15 +253,22 @@ for doc in flist:
 					if(ver!=-1):
 						
 						type_=[]
-						type_學歷=["大學","高職","高中","國中","國小","小學","未受教育","高等","五專","健全","成熟"]
-						#type_學歷+=["自述","自陳","兼衡"]
+						type_學歷=[]
+						type_學歷=["大學","高職","高中","國中","國小","小學","未受教育","五專","高等"]
+						#type_學歷+=["健全","成熟"]
+						type_學歷+=["自述","自陳","兼衡"]
+						tempc=100
 
 						for i in range(len(type_學歷)):
-							
-							type_.append(find_after(file['JFULL'],type_學歷[i],學歷[ver]))
-							type_.append(find_after(file['JFULL'],學歷[ver],type_學歷[i]))
-						
-						
+							a=[]
+
+							a.append(find_after(file['JFULL'],type_學歷[i],學歷[ver]))
+							a.append(find_after(file['JFULL'],學歷[ver],type_學歷[i]))
+							type_+=a
+							if((a[0]!=-1 or a[1]!=-1) and i<tempc):
+								tempc=i
+						if(tempc!=100):
+							count_學歷[tempc]+=1
 						"""
 						if(type_.count(-1)!=len(type_)):
 							ct9+=1
@@ -292,15 +283,24 @@ for doc in flist:
 					if(ver!=-1):
 
 						type_=[]
+						type_經濟=[]
 						type_經濟=["富裕","小康","一般","普通","勉持","貧寒","清寒","貧窮","貧困"]
 						type_經濟+=["自述","自陳","兼衡"]
-
+						tempc=100
 						for i in range(len(type_經濟)):
-							type_.append(find_after(file['JFULL'],type_經濟[i],經濟[ver]))
-							type_.append(find_after(file['JFULL'],經濟[ver],type_經濟[i]))
+							a=[]
+
+							a.append(find_after(file['JFULL'],type_經濟[i],經濟[ver]))
+							a.append(find_after(file['JFULL'],經濟[ver],type_經濟[i]))
+							type_+=a
+							if((a[0]!=-1 or a[1]!=-1) and i<tempc):
+								tempc=i
+						
+						if(tempc!=100):
+							count_經濟[tempc]+=1
 						
 
-						#"""
+						"""
 						if(type_.count(-1)!=len(type_)):
 							ct9+=1
 						else:
@@ -315,8 +315,8 @@ for doc in flist:
 					if(len(t_)==2 and (t_[0].count(-1)!=len(t_[0]) and t_[1].count(-1)!=len(t_[1]))):
 						ct10+=1
 						#=========!
-						#print(file['JID'])
-						#print(t_)
+						print(file['JID'])
+						print(t_)
 						#=========!
 
 					#if(file['JFULL'].find("身心障礙")!=-1):
@@ -355,4 +355,6 @@ f.close()
 
 
 print(ct3,ct4,ct5,ct6,ct7,ct8,ct9,ct10)
+print(count_學歷,sum(count_學歷),ct7)
+print(count_經濟,sum(count_經濟),ct6)
 
