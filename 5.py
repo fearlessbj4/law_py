@@ -9,18 +9,14 @@ from colorama import Fore, Style
 from section_cut import cut,find_after,find_from_list,search_from_list,find_context
 import zh_calculator as cal
 from ver_5 import *
-from func_5 import *
+import matplotlib.pyplot as plt
+import numpy as np
+from sd import *
+import sys
 
 
 
-#"""
-list_a=os.popen("cat ./stuff_type/a.txt").readlines()
-list_b=os.popen("cat ./stuff_type/b.txt").readlines()
-list_c=os.popen("cat ./stuff_type/c.txt").readlines()
-list_a=[i.replace("\n","") if i.find("\n")!=-1 else i for i in list_a]
-list_b=[i.replace("\n","") if i.find("\n")!=-1 else i for i in list_c]
-list_c=[i.replace("\n","") if i.find("\n")!=-1 else i for i in list_c]
-#"""
+temp_lst=[]
 tempc=0
 ct1=0
 ct11=0
@@ -33,10 +29,15 @@ ct7=0
 ct8=0
 ct9=0
 ct10=0
+ct11=0
+ct12=0
 
+k_ver=1#學歷,經濟
+k_type=type_學歷 if k_ver==0 else type_經濟
 
-k=0
-output=[]#[[title,stuff,stuff_type,stuff_value]]
+otct_lst=[[0,0,0] for i in range(len(k_type))]
+#output=[[[] for j in range(len(type_狀態))] for i in range (len(type_學歷))]#[[title,stuff,stuff_type,stuff_value]]
+output=[[] for i in range (len(k_type))]
 simple_output=[]
 small_output=[]
 total_price=0
@@ -249,26 +250,26 @@ for doc in flist:
 						t_=[]
 						ct8+=1
 					
+
+					temp_lst=[]#============!
 					ver=find_from_list(file['JFULL'],學歷)
 					if(ver!=-1):
 						
 						type_=[]
-						type_學歷=[]
-						type_學歷=["大學","高職","高中","國中","國小","小學","未受教育","五專","高等"]
-						#type_學歷+=["健全","成熟"]
-						type_學歷+=["自述","自陳","兼衡"]
+						
 						tempc=100
 
 						for i in range(len(type_學歷)):
 							a=[]
 
-							a.append(find_after(file['JFULL'],type_學歷[i],學歷[ver]))
-							a.append(find_after(file['JFULL'],學歷[ver],type_學歷[i]))
+							a.append(find_after(file['JFULL'].replace(" ",""),type_學歷[i],學歷[ver]))
+							a.append(find_after(file['JFULL'].replace(" ",""),學歷[ver],type_學歷[i]))
 							type_+=a
 							if((a[0]!=-1 or a[1]!=-1) and i<tempc):
 								tempc=i
 						if(tempc!=100):
 							count_學歷[tempc]+=1
+							temp_lst.append(type_學歷[tempc])#============!
 						"""
 						if(type_.count(-1)!=len(type_)):
 							ct9+=1
@@ -283,21 +284,20 @@ for doc in flist:
 					if(ver!=-1):
 
 						type_=[]
-						type_經濟=[]
-						type_經濟=["富裕","小康","一般","普通","勉持","貧寒","清寒","貧窮","貧困"]
-						type_經濟+=["自述","自陳","兼衡"]
+						
 						tempc=100
 						for i in range(len(type_經濟)):
 							a=[]
 
-							a.append(find_after(file['JFULL'],type_經濟[i],經濟[ver]))
-							a.append(find_after(file['JFULL'],經濟[ver],type_經濟[i]))
+							a.append(find_after(file['JFULL'].replace(" ",""),type_經濟[i],經濟[ver]))
+							a.append(find_after(file['JFULL'].replace(" ",""),經濟[ver],type_經濟[i]))
 							type_+=a
 							if((a[0]!=-1 or a[1]!=-1) and i<tempc):
 								tempc=i
 						
 						if(tempc!=100):
 							count_經濟[tempc]+=1
+							temp_lst.append(type_經濟[tempc])#============!
 						
 
 						"""
@@ -312,11 +312,58 @@ for doc in flist:
 					
 
 					
-					if(len(t_)==2 and (t_[0].count(-1)!=len(t_[0]) and t_[1].count(-1)!=len(t_[1]))):
+					if(len(temp_lst)==2 and len(t_)==2 and (t_[0].count(-1)!=len(t_[0]) and t_[1].count(-1)!=len(t_[1]))):
 						ct10+=1
-						#=========!
+						"""#=========!
 						print(file['JID'])
-						print(t_)
+						print("涉案金額",p1)
+						print("換算罰金",p2)
+						#print(t_)
+						print(temp_lst)
+						#"""#============!
+						
+						if(search_from_list(k_type,temp_lst[k_ver])!=-1):
+							if(1):
+							#if(find_from_list(file['JFULL'].replace("\r\n      ",""),type_狀態)!=-1):
+								ff=file['JFULL'].replace(" ","")
+								tct=find_from_list(ff,type_狀態)
+								
+								#print(type_狀態[find_from_list(file['JFULL'],type_狀態)])
+								for i in range(len(k_type)):
+									jd=True
+									#jd=(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 
+									#and file['JFULL'].find("不構成累犯")==-1 and file['JFULL'].find("加重其刑")!=-1)
+									if(temp_lst[k_ver]==k_type[i] and jd!= False):
+										output[i].append([p1,p2])	
+										#if(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 
+										#	and file['JFULL'].find("不構成累犯")==-1 and file['JFULL'].find("加重其刑")!=-1):
+										#	otct_lst[i][2]+=1
+										if(tct==1):
+											otct_lst[i][1]+=1
+										elif(tct==0 or tct==2):
+											otct_lst[i][0]+=1
+										else:
+											...
+										
+										if(i>=type_學歷.index("自述") and tct==1):
+											print(file['JID'])
+											print(file['JFULL'])
+											#print(file['JFULL'].find("自陳國"))
+											print(ord(file['JFULL'][1032]))
+											print(ord(" "))
+											print("-----")
+											print(file['JFULL'][1032])
+											print("-----")
+
+								#if(temp_lst[0]=="大學"):
+								#	ct11+=1
+								#	output.append([p1,p2])
+								
+
+							else:
+								...
+								#print("?")
+
 						#=========!
 
 					#if(file['JFULL'].find("身心障礙")!=-1):
@@ -325,6 +372,11 @@ for doc in flist:
 					t_=[]
 
 					#print(small_str)
+					if(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 and file['JFULL'].find("不構成累犯")==-1):
+						ct11+=1
+						if(file['JFULL'].find("加重其刑")!=-1 and len(temp_lst)!=0):
+							#print(file['JID'])
+							ct12+=1
 					small_output.append(small_str)
 					small_str=""
 					
@@ -353,8 +405,102 @@ f.close()
 """
 					#print(file['JFULL'])
 
+#"""output
+#print(ct3,ct4,ct5,ct6,ct7,ct8,ct9,ct10)
+#print(count_學歷,sum(count_學歷),ct7)
+#print(count_經濟,sum(count_經濟),ct6)
 
-print(ct3,ct4,ct5,ct6,ct7,ct8,ct9,ct10)
-print(count_學歷,sum(count_學歷),ct7)
-print(count_經濟,sum(count_經濟),ct6)
+#print(output)
+#print(sum([len(output[i]) for i in range(len(output))]))
+#"""
+#"""
+#"""
+print("===============")
+print(ct11,ct12)
+print(otct_lst)
+print("===============")
+os.popen("rm -rf fig")
+os.popen("mkdir fig")
+color_lst=["red","orange","yellow","green","blue"]
+color_ct=0
+for i in range(len(output)):
+	
+	if(len(output[i])>0):
+		#output=outlier_2D(output,sd_2D(output)[0][0],sd_2D(output)[0][1],sd_2D(output)[1][0],sd_2D(output)[1][1])
+		print(k_type[i])	
+		temp_ot=output[i]
+		
+		#"""經濟
+		if(k_ver==1):
+			if(i==type_經濟.index("貧寒")):
+				temp_ot+=output[type_經濟.index("貧窮")]
+				temp_ot+=output[type_經濟.index("貧困")]
+			elif(i==type_經濟.index("自述")):
+				temp_ot+=output[type_經濟.index("自陳")]
+				temp_ot+=output[type_經濟.index("兼衡")]
+			elif(i==type_經濟.index("貧窮") or i==type_經濟.index("貧困") 
+				or i==type_經濟.index("自陳") or i==type_經濟.index("兼衡")):
+				continue
+		#"""
 
+		#"""學歷
+		if(k_ver==0):
+			if(i==type_學歷.index("大學")):
+				temp_ot+=output[type_學歷.index("大專")]
+			elif(i==type_學歷.index("五專")):
+				temp_ot+=output[type_學歷.index("二專")]
+				temp_ot+=output[type_學歷.index("三專")]
+				temp_ot+=output[type_學歷.index("專科")]
+			elif(i==type_學歷.index("高中")):
+				temp_ot+=output[type_學歷.index("高職")]
+			elif(i==type_學歷.index("國小")):
+				temp_ot+=output[type_學歷.index("小學")]
+			elif(i==type_學歷.index("自述")):
+				temp_ot+=output[type_學歷.index("自陳")]
+				temp_ot+=output[type_學歷.index("兼衡")]
+			elif(i==type_學歷.index("大專") or i==type_學歷.index("二專") 
+				or i==type_學歷.index("三專") or i==type_學歷.index("專科") 
+				or i==type_學歷.index("高職") or i==type_學歷.index("小學") 
+				or i==type_學歷.index("自陳") or i==type_學歷.index("兼衡")):
+				continue
+		#"""
+
+		a=len(temp_ot)#
+
+		temp_ot=outlier_2D_3(temp_ot)
+		simple_np=np.array(temp_ot)
+
+		print("%.2f%s %d%s%d"%(len(temp_ot)/a*100,"%",len(temp_ot),"/",a))#
+		#print(len(simple_np))
+		x=[e[0] for e in simple_np]
+		y=[e[1] for e in simple_np]
+
+
+		plt.xlabel("value")
+		plt.ylabel("fine")
+
+		plt.xlim(0,110000)
+		plt.ylim(0,200000)
+		mean_ot=1
+		mean_ot_lst=[1 for i in range(100)]
+		mct=0
+
+		for ij in range(len(temp_ot)):
+			mean_ot_lst[mct]*=(temp_ot[ij][1]/temp_ot[ij][0])
+			if(mean_ot_lst[mct]>=sys.maxsize/100):
+				mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
+				mct+=1
+		mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
+		print(mean_ot)
+		print("--------")
+		print(mct)
+
+		plt.scatter(simple_np[:,0],simple_np[:,1],1,color=color_lst[color_ct])
+		plt.plot([0,200000/mean_ot],[0,200000],color=color_lst[color_ct])
+		color_ct+=1
+		#plt.plot(x,y)
+		plt.savefig("./fig/"+str(k_type[i])+"_ot3.png")
+		#plt.clf()
+		#plt.show()
+
+#"""
