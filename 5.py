@@ -32,8 +32,11 @@ ct10=0
 ct11=0
 ct12=0
 
-k_ver=1#學歷,經濟
-k_type=type_學歷 if k_ver==0 else type_經濟
+
+t_var=1#geometric_mean,mean
+title="g_mean" if t_var==0 else "mean"
+k_var=0#學歷,經濟
+k_type=type_學歷 if k_var==0 else type_經濟
 
 otct_lst=[[0,0,0] for i in range(len(k_type))]
 #output=[[[] for j in range(len(type_狀態))] for i in range (len(type_學歷))]#[[title,stuff,stuff_type,stuff_value]]
@@ -142,7 +145,7 @@ for doc in flist:
 	
 	if (doc[:-1].endswith(".json")):
 		file = json.load(open(s+"/"+doc[:-1],"r"))
-		if (file['JCASE'].find("簡")!=-1 and file['JFULL'].find("犯竊盜罪")!=-1 and file['JFULL'].find("犯罪事實")!=-1 
+		if (file['JFULL'].find("犯竊盜罪")!=-1 and file['JFULL'].find("犯罪事實")!=-1 
 			and file['JFULL'].find("得手")!=-1
 			and not(file['JFULL'].find("報告")==-1 and file['JFULL'].find("偵")==-1 and file['JFULL'].find("辦")==-1)):
 			
@@ -167,6 +170,7 @@ for doc in flist:
 			total_price=0
 			
 			if(len(print_str)>=20):	
+				#print(ct3)
 				total_price=0
 				p_str=cut(file['JFULL'],"short",start_point,mid_point,end_point,start_list,mid_list,end_list)
 				p_str=p_str.replace(" ","")
@@ -322,7 +326,7 @@ for doc in flist:
 						print(temp_lst)
 						#"""#============!
 						
-						if(search_from_list(k_type,temp_lst[k_ver])!=-1):
+						if(search_from_list(k_type,temp_lst[k_var])!=-1):
 							if(1):
 							#if(find_from_list(file['JFULL'].replace("\r\n      ",""),type_狀態)!=-1):
 								ff=file['JFULL'].replace(" ","")
@@ -330,10 +334,11 @@ for doc in flist:
 								
 								#print(type_狀態[find_from_list(file['JFULL'],type_狀態)])
 								for i in range(len(k_type)):
+						#<jd------------------>
 									jd=True
 									#jd=(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 
 									#and file['JFULL'].find("不構成累犯")==-1 and file['JFULL'].find("加重其刑")!=-1)
-									if(temp_lst[k_ver]==k_type[i] and jd!= False):
+									if(temp_lst[k_var]==k_type[i] and jd!= False):
 										output[i].append([p1,p2])	
 										#if(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 
 										#	and file['JFULL'].find("不構成累犯")==-1 and file['JFULL'].find("加重其刑")!=-1):
@@ -345,15 +350,6 @@ for doc in flist:
 										else:
 											...
 										
-										if(i>=type_學歷.index("自述") and tct==1):
-											print(file['JID'])
-											print(file['JFULL'])
-											#print(file['JFULL'].find("自陳國"))
-											print(ord(file['JFULL'][1032]))
-											print(ord(" "))
-											print("-----")
-											print(file['JFULL'][1032])
-											print("-----")
 
 								#if(temp_lst[0]=="大學"):
 								#	ct11+=1
@@ -406,7 +402,7 @@ f.close()
 					#print(file['JFULL'])
 
 #"""output
-#print(ct3,ct4,ct5,ct6,ct7,ct8,ct9,ct10)
+print(ct3,ct4,ct5,ct6,ct7,ct8,ct9,ct10)
 #print(count_學歷,sum(count_學歷),ct7)
 #print(count_經濟,sum(count_經濟),ct6)
 
@@ -414,14 +410,15 @@ f.close()
 #print(sum([len(output[i]) for i in range(len(output))]))
 #"""
 #"""
-#"""
+"""
 print("===============")
 print(ct11,ct12)
 print(otct_lst)
 print("===============")
-os.popen("rm -rf fig")
-os.popen("mkdir fig")
-color_lst=["red","orange","yellow","green","blue"]
+#"""
+
+#os.popen("mkdir fig")
+color_lst=["red","orange","yellow","green","blue","purple","black","pink"]
 color_ct=0
 for i in range(len(output)):
 	
@@ -431,7 +428,7 @@ for i in range(len(output)):
 		temp_ot=output[i]
 		
 		#"""經濟
-		if(k_ver==1):
+		if(k_var==1):
 			if(i==type_經濟.index("貧寒")):
 				temp_ot+=output[type_經濟.index("貧窮")]
 				temp_ot+=output[type_經濟.index("貧困")]
@@ -444,7 +441,7 @@ for i in range(len(output)):
 		#"""
 
 		#"""學歷
-		if(k_ver==0):
+		if(k_var==0):
 			if(i==type_學歷.index("大學")):
 				temp_ot+=output[type_學歷.index("大專")]
 			elif(i==type_學歷.index("五專")):
@@ -485,22 +482,37 @@ for i in range(len(output)):
 		mean_ot_lst=[1 for i in range(100)]
 		mct=0
 
-		for ij in range(len(temp_ot)):
-			mean_ot_lst[mct]*=(temp_ot[ij][1]/temp_ot[ij][0])
-			if(mean_ot_lst[mct]>=sys.maxsize/100):
-				mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
-				mct+=1
-		mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
-		print(mean_ot)
-		print("--------")
-		print(mct)
+		if(t_var!=0):
+			mean_ot=sum([temp_ot[i][1]/temp_ot[i][0] for i in range(len(temp_ot))])/len(temp_ot)
+		else:
+			for ij in range(len(temp_ot)):
+				mean_ot_lst[mct]*=(temp_ot[ij][1]/temp_ot[ij][0])
+				if(mean_ot_lst[mct]>=sys.maxsize/100):
+					mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
+					mct+=1
+			mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
+			print("g_mean: "+str(mean_ot))
+			print("mean: "+str(sum([temp_ot[i][1]/temp_ot[i][0] for i in range(len(temp_ot))])/len(temp_ot)))
+			#print("--------")
+			#print(mct)
 
-		plt.scatter(simple_np[:,0],simple_np[:,1],1,color=color_lst[color_ct])
+		plt.title(title)
+		plt.scatter(simple_np[:,0],simple_np[:,1],1,color=color_lst[color_ct])	
 		plt.plot([0,200000/mean_ot],[0,200000],color=color_lst[color_ct])
 		color_ct+=1
 		#plt.plot(x,y)
-		plt.savefig("./fig/"+str(k_type[i])+"_ot3.png")
-		#plt.clf()
+		
+		#"""#<--------------[on,off]=[1,2]
+		if(k_var==0):
+			plt.savefig("./fig/學歷_ot3_"+title+".png")
+		elif(k_var==1):
+			plt.savefig("./fig/經濟_ot3_"+title+".png")
+		else:
+			plt.savefig("./fig/經濟_ot3_"+title+".png")#undone
+		"""
+		plt.savefig("./fig/"+("學歷" if k_var==0 else "經濟")+"/"+str(k_type[i])+"_ot3_"+title+".png")
+		plt.clf()
+		#"""
 		#plt.show()
 
 #"""
