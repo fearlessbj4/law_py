@@ -25,7 +25,10 @@ def number_only(target,the_list):
 			target=target[:char_i]+"r"+target[char_i+1:]
 
 	target=target.replace("r","")
-	return int(target)
+	if(target==""):
+		return int(0)
+	else:
+		return int(target)
 
 def pre_calculator(target):
 	if(target.find("零")!=-1):
@@ -51,7 +54,7 @@ def pre_calculator(target):
 	else:
 		return target
 def fake_calculator(target,offset):
-	sum=0
+	the_sum=0
 
 
 	if(target.find(element_char)!=-1 or offset>0):
@@ -68,8 +71,8 @@ def fake_calculator(target,offset):
 				offset+=4
 			return fake_calculator(target[:target.find(element_char)-1],offset)
 		elif(len(target)==0):
-			sum=-1
-			return sum
+			the_sum=-1
+			return the_sum
 		elif(target[-1]=="拾" or target[-1]=="佰" or target[-1]=="仟" or target[-1]=="萬"):
 			
 			t=target[-1]
@@ -105,20 +108,20 @@ def fake_calculator(target,offset):
 				break				
 
 			str_sum+="0"*offset
-			sum=(int(str_sum) if (str_sum!='') else 0)
-			return sum
+			the_sum=(int(str_sum) if (str_sum!='') else 0)
+			return the_sum
 
 
 	else:
-		sum=-1
-	return sum
-def number_k_switch(sum):
+		the_sum=-1
+	return the_sum
+def number_k_switch(the_sum):
 	s=""
-	for i in range(len(str(sum))):
-		if((len(str(sum))-i)%3==0 and i!=0):
+	for i in range(len(str(the_sum))):
+		if((len(str(the_sum))-i)%3==0 and i!=0):
 			s+=","
 
-		s+=str(sum)[i]
+		s+=str(the_sum)[i]
 	return s
 
 #t1="1009萬0020元"
@@ -126,7 +129,8 @@ def number_k_switch(sum):
 def enter(t1,e):
 	global element_char
 	element_char=str(e)#防呆
-	sum=0
+	the_sum=0
+	sum_list=[]
 	t1=t1.replace("千","仟")
 	if(find_after(t1,element_char,element_char)!=-1):
 		t1_t=t1
@@ -134,16 +138,20 @@ def enter(t1,e):
 			t1_h=t1_t[:t1_t.find(element_char)+1]
 			t1_t=t1_t[t1_t.find(element_char)+1:]
 			if(int(main(t1_h).replace(",",""))==-1):
-				sum+=0
+				sum_list.append(int(0))
+				the_sum+=0
 			else:
-				sum+=int(main(t1_h).replace(",",""))
-		return sum
+				sum_list.append(int(main(t1_h).replace(",","")))
+				the_sum+=int(main(t1_h).replace(",",""))
+		return sum(sum_list)
 	else:
 		if(int(main(t1).replace(",",""))==-1):
-			sum+=0
+			sum_list.append(int(0))
+			the_sum+=0
 		else:
-			sum+=int(main(t1).replace(",",""))
-		return sum
+			sum_list.append(int(main(t1).replace(",","")))
+			the_sum+=int(main(t1).replace(",",""))
+		return sum(sum_list)
 
 def pre(t1):
 	global number_zh

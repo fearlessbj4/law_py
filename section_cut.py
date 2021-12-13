@@ -61,7 +61,7 @@ def search_from_list(lst,target):
 		if(target==lst[i]):
 			flag=i
 			break
-	return flag
+	return int(flag)
 def find_from_list(target,lst):
 	flag=-1
 	for i in range(len(lst)):
@@ -76,3 +76,9 @@ def find_all_from_list(lst,target):
 		if(target.find(lst[i])!=-1):
 			flag.append(i)
 	return flag
+def revise(lst,revise_lst):
+	revised_lst=lst
+	for i in revised_lst:
+		revised_lst=revised_lst.replace(i,"-")
+	return revised_lst
+
