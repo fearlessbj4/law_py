@@ -6,7 +6,7 @@ import random
 from pprint import pprint
 import colorama
 from colorama import Fore, Style
-from section_cut import cut,find_after,find_from_list,search_from_list,find_context
+from section_cut import *
 import zh_calculator as cal
 from ver_5 import *
 import matplotlib.pyplot as plt
@@ -32,9 +32,10 @@ ct10=0
 ct11=0
 ct12=0
 
-
-t_var=1#geometric_mean,mean
+r_var=0
+t_var=0#geometric_mean,mean
 title="g_mean" if t_var==0 else "mean"
+title+="" if r_var==0 else "_r"
 k_var=0#學歷,經濟
 k_type=type_學歷 if k_var==0 else type_經濟
 
@@ -45,6 +46,7 @@ simple_output=[]
 small_output=[]
 total_price=0
 t_=[]
+
 
 tp_str=""
 output_str=""
@@ -101,7 +103,7 @@ def find_stuff(title,lst,st,ed,offset_st,offset_ed,num_list):
 	
 	if(lst[lst.find(st)+offset_st:lst.find(ed)+offset_ed].find(key_char)!=-1):
 		t=lst[lst.find(st)+offset_st:lst.find(ed)+offset_ed]
-		tp_str=str(Fore.WHITE+t[:t.find(key_char)]+Fore.WHITE+key_char+Fore.WHITE+t[t.find(key_char)+len(key_char):])
+		tp_str=str(Fore.WHITE+t[:t.find(key_char)]+Fore.RED+key_char+Fore.BLUE+t[t.find(key_char)+len(key_char):])
 		output_str+="\n"+tp_str
 		
 		content=t[t.find(key_char)+1:]
@@ -139,22 +141,42 @@ def find_stuff(title,lst,st,ed,offset_st,offset_ed,num_list):
 #"""
 str_ii=""
 s=str("./target_case")
-flist=os.popen("ls "+s).readlines()
 
+flist=os.popen("ls "+s).readlines()
+富裕=os.popen("cat ./富裕.txt").readlines()
+富裕=[i.replace("\n","")for i in 富裕]
+ct_富裕=0
 for doc in flist:
 	
 	if (doc[:-1].endswith(".json")):
 		file = json.load(open(s+"/"+doc[:-1],"r"))
-		if (file['JFULL'].find("犯竊盜罪")!=-1 and file['JFULL'].find("犯罪事實")!=-1 
-			and file['JFULL'].find("得手")!=-1
-			and not(file['JFULL'].find("報告")==-1 and file['JFULL'].find("偵")==-1 and file['JFULL'].find("辦")==-1)):
+		
+		if (file['JTITLE'].find("擄人勒贖")==-1):
+			file['JFULL']=file['JFULL'].replace("叁","參").replace("十","拾").replace("\r\n    ","")
+			ct9_=False
 			
+			if(file['JFULL'].find("富裕")!=-1 ):
+				file['JFULL']=file['JFULL'].replace("花蓮市富裕","花蓮市富_裕").replace("江富裕","江富_裕").replace("陳富裕","陳富_裕").replace("富裕二街","富_裕二街").replace("富裕彩券行","富_裕彩券行").replace("富裕一街","富_裕一街").replace("鄭富裕","鄭富_裕").replace("翔富裕","翔富_裕").replace("佯稱為家境富裕","佯稱為家境富_裕")
+				file['JFULL']=file['JFULL'].replace("富裕旅店","富_裕旅店").replace("富裕門市","富_裕門市")
+			#file['JFULL']=revise(file['JFULL'],富裕_revise)
+			if(file['JFULL'].find("富裕")!=-1 ):
+				
+				
+				if(file['JFULL'].find("不富裕")==-1):
+					ct9_=True
+					
+					#print(file['JID'])
+					ct9+=1
+				else:
+					file['JFULL']=file['JFULL'].replace("不富裕","勉持").replace("不是很富裕","勉持")#<-------revise-------
+
+
 			tp_str=""
 			output_str=""
 			ct1+=1
 			
 			
-			file['JFULL']=file['JFULL'].replace("叁","參").replace("十","拾").replace("\r\n    ","")
+			
 
 			
 
@@ -169,15 +191,16 @@ for doc in flist:
 			
 			total_price=0
 			
-			if(len(print_str)>=20):	
+			if(len(print_str)>=20):
 				#print(ct3)
 				total_price=0
 				p_str=cut(file['JFULL'],"short",start_point,mid_point,end_point,start_list,mid_list,end_list)
 				p_str=p_str.replace(" ","")
+				print_str=print_str.replace("      ","").replace(" ","").replace("\r\n","").replace("(下同)","").replace("（下同）","").replace("【下同】","").replace("餘萬元","萬元")
 				fc(file['JID'],print_str,keyward,"得手","。")
 				tp_output_str=output_str
 
-				p_str=p_str.replace(" ","")
+				p_str=p_str.replace(" ","").replace("\r\n","").replace("(下同)","").replace("（下同）","").replace("【下同】","").replace("餘萬元","萬元")
 				j1=p_str.find("易科罰金")
 				j2=p_str.find("易服勞役")
 				y=0
@@ -196,6 +219,28 @@ for doc in flist:
 						y=cal.enter(p_str,"年")
 						m=cal.enter(p_str,"月")
 						d=cal.enter(p_str,"日")
+				if([y,m,d].count(0)==3):
+					temp_f=file['JFULL'][:file['JFULL'].find("犯罪事實\r\n")]
+					"""
+					if(find_after(temp_f,"易科罰金","易科罰金")!=-1 and temp_f.find("應執行")!=-1):
+						temp_f=temp_f[temp_f.find("應執行"):find_after(temp_f,"應執行","，")]
+						y=cal.enter(temp_f[:temp_f.find("易科罰金")],"年")
+						m=cal.enter(temp_f[:temp_f.find("易科罰金")],"月")
+						d=cal.enter(temp_f[:temp_f.find("易科罰金")],"日")
+					el
+					"""
+					if(temp_f.find("應執行")!=-1):
+						y=cal.enter(temp_f[temp_f.find("應執行"):find_after(temp_f,"應執行","，")],"年")
+						m=cal.enter(temp_f[temp_f.find("應執行"):find_after(temp_f,"應執行","，")],"月")
+						d=cal.enter(temp_f[temp_f.find("應執行"):find_after(temp_f,"應執行","，")],"日")
+					if([y,m,d].count(0)==3 and temp_f.find("有期徒刑")!=-1):
+						y=cal.enter(temp_f[temp_f.find("有期徒刑"):find_after(temp_f,"有期徒刑","，")],"年")
+						m=cal.enter(temp_f[temp_f.find("有期徒刑"):find_after(temp_f,"有期徒刑","，")],"月")
+						d=cal.enter(temp_f[temp_f.find("有期徒刑"):find_after(temp_f,"有期徒刑","，")],"日")
+					if([y,m,d].count(0)==3 and temp_f.find("拘役")!=-1):
+						y=cal.enter(temp_f[temp_f.find("拘役"):find_after(temp_f,"拘役","，")],"年")
+						m=cal.enter(temp_f[temp_f.find("拘役"):find_after(temp_f,"拘役","，")],"月")
+						d=cal.enter(temp_f[temp_f.find("拘役"):find_after(temp_f,"拘役","，")],"日")
 					
 				if(j2!=-1):
 					
@@ -205,19 +250,39 @@ for doc in flist:
 						f_p_str=p_str[:p_str.find("易服勞役")]
 						
 						fine=cal.enter(f_p_str[find_after(f_p_str,"罰金","應執行"):],"元")
+						if(fine==0):
+							fine=cal.enter(f_p_str[f_p_str.find("罰金"):],"元")
 						
 						
 					else:
 						fine=cal.enter(p_str,"元")
 						
-					
-					
 				
 				ct3+=1
 				p1=total_price
+				if(p1==0):
+					p1=cal.enter(print_str,"元")
+					if(p1==0 and (file['JFULL'].find("犯罪所得")!=-1 or file['JFULL'].find("不法所得")!=-1)):
+						temp_f=file['JFULL']
+						p1=cal.enter(temp_f[temp_f.find("犯罪所得"):find_after(temp_f,"犯罪所得","，")],"元")
+						if(p1==0 and file['JFULL'].find("不法所得")!=-1):
+							p1=cal.enter(temp_f[temp_f.find("不法所得"):find_after(temp_f,"不法所得","，")],"元")
 				p2=(m if m!=-1 else 0)*30*1000+(d if d!=-1 else 0)*1000+(fine if fine!=-1 else 0)
 				
 				total_price=0
+
+				"""
+				if(ct_富裕<len(富裕) and file['JID']==富裕[ct_富裕]):
+					print(file['JID'])
+					print("--------------------------------------")
+					print(print_str)
+					print(p1)
+					print(p2)
+					#print(print_str)
+					print("--------------------------------------")
+					ct_富裕+=1
+				#"""
+
 				if(file['JFULL'].find("爰")!=-1 and find_after(file['JFULL'],"爰","被告")!=-1):
 					ct5+=1
 				#"""
@@ -248,7 +313,8 @@ for doc in flist:
 					
 					small_str+=str(Style.RESET_ALL)+"\n"
 					
-					
+					#if(ct3<100):
+					#	print(small_str)
 					
 					if(find_after(file['JFULL'],"坦承","所示之刑")!=-1):
 						t_=[]
@@ -265,21 +331,16 @@ for doc in flist:
 
 						for i in range(len(type_學歷)):
 							a=[]
-
-							a.append(find_after(file['JFULL'].replace(" ",""),type_學歷[i],學歷[ver]))
-							a.append(find_after(file['JFULL'].replace(" ",""),學歷[ver],type_學歷[i]))
+							temp_f=file['JFULL'].replace(" ","").replace("\r\n","")
+							a.append(find_after(temp_f,type_學歷[i],學歷[ver]))
+							a.append(find_after(temp_f,學歷[ver],type_學歷[i]))
 							type_+=a
 							if((a[0]!=-1 or a[1]!=-1) and i<tempc):
 								tempc=i
 						if(tempc!=100):
 							count_學歷[tempc]+=1
 							temp_lst.append(type_學歷[tempc])#============!
-						"""
-						if(type_.count(-1)!=len(type_)):
-							ct9+=1
-						else:
-							print(file['JID'])
-						#"""
+						
 
 						t_.append(type_)
 						ct7+=1
@@ -293,8 +354,12 @@ for doc in flist:
 						for i in range(len(type_經濟)):
 							a=[]
 
-							a.append(find_after(file['JFULL'].replace(" ",""),type_經濟[i],經濟[ver]))
-							a.append(find_after(file['JFULL'].replace(" ",""),經濟[ver],type_經濟[i]))
+							
+							temp_f=file['JFULL'].replace(" ","").replace("\r\n","")
+							a.append(find_context(file['JFULL'].replace(" ",""),type_經濟[i],經濟[ver],20))
+							a.append(find_context(file['JFULL'].replace(" ",""),經濟[ver],type_經濟[i],20))
+							#a.append(find_after(temp_f,type_經濟[i],經濟[ver]))
+							#a.append(find_after(temp_f,經濟[ver],type_經濟[i]))
 							type_+=a
 							if((a[0]!=-1 or a[1]!=-1) and i<tempc):
 								tempc=i
@@ -302,6 +367,7 @@ for doc in flist:
 						if(tempc!=100):
 							count_經濟[tempc]+=1
 							temp_lst.append(type_經濟[tempc])#============!
+							
 						
 
 						"""
@@ -335,11 +401,18 @@ for doc in flist:
 								#print(type_狀態[find_from_list(file['JFULL'],type_狀態)])
 								for i in range(len(k_type)):
 						#<jd------------------>
-									jd=True
-									#jd=(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 
-									#and file['JFULL'].find("不構成累犯")==-1 and file['JFULL'].find("加重其刑")!=-1)
+									if(r_var==0):
+										jd=True
+									else:
+										jd=(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 
+										and file['JFULL'].find("不構成累犯")==-1 and file['JFULL'].find("加重其刑")!=-1)
 									if(temp_lst[k_var]==k_type[i] and jd!= False):
-										output[i].append([p1,p2])	
+										output[i].append([p1,p2])
+										
+										if(k_type[i]=="富裕"):
+											#print(file['JID'])
+											os.popen("cp \"./target_case/"+file['JID']+".json\" ./富裕")
+
 										#if(file['JFULL'].find("累犯")!=-1 and file['JFULL'].find("未構成累犯")==-1 
 										#	and file['JFULL'].find("不構成累犯")==-1 and file['JFULL'].find("加重其刑")!=-1):
 										#	otct_lst[i][2]+=1
@@ -418,11 +491,13 @@ print("===============")
 #"""
 
 #os.popen("mkdir fig")
-color_lst=["red","orange","yellow","green","blue","purple","black","pink"]
+jd=1
+
+color_lst=["red","orange","yellow","green","blue","purple","black"]
 color_ct=0
 for i in range(len(output)):
 	
-	if(len(output[i])>0):
+	if(jd==1 and len(output[i])>0):
 		#output=outlier_2D(output,sd_2D(output)[0][0],sd_2D(output)[0][1],sd_2D(output)[1][0],sd_2D(output)[1][1])
 		print(k_type[i])	
 		temp_ot=output[i]
@@ -442,7 +517,10 @@ for i in range(len(output)):
 
 		#"""學歷
 		if(k_var==0):
-			if(i==type_學歷.index("大學")):
+			if(i==type_學歷.index("研究所")):
+				temp_ot+=output[type_學歷.index("博士")]
+				temp_ot+=output[type_學歷.index("碩士")]
+			elif(i==type_學歷.index("大學")):
 				temp_ot+=output[type_學歷.index("大專")]
 			elif(i==type_學歷.index("五專")):
 				temp_ot+=output[type_學歷.index("二專")]
@@ -455,7 +533,8 @@ for i in range(len(output)):
 			elif(i==type_學歷.index("自述")):
 				temp_ot+=output[type_學歷.index("自陳")]
 				temp_ot+=output[type_學歷.index("兼衡")]
-			elif(i==type_學歷.index("大專") or i==type_學歷.index("二專") 
+			elif(i==type_學歷.index("博士") or i==type_學歷.index("碩士")
+				or i==type_學歷.index("大專") or i==type_學歷.index("二專") 
 				or i==type_學歷.index("三專") or i==type_學歷.index("專科") 
 				or i==type_學歷.index("高職") or i==type_學歷.index("小學") 
 				or i==type_學歷.index("自陳") or i==type_學歷.index("兼衡")):
@@ -485,12 +564,20 @@ for i in range(len(output)):
 		if(t_var!=0):
 			mean_ot=sum([temp_ot[i][1]/temp_ot[i][0] for i in range(len(temp_ot))])/len(temp_ot)
 		else:
+			mean_ot_ct=1
 			for ij in range(len(temp_ot)):
+				mean_ot_ct*=(temp_ot[ij][1]/temp_ot[ij][0])
+				if(mean_ot_ct>=sys.maxsize/200):
+					mean_ot*=mean_ot_ct**(1/len(temp_ot))
+					mean_ot_ct=1
+			mean_ot*=mean_ot_ct**(1/len(temp_ot))
+			"""
 				mean_ot_lst[mct]*=(temp_ot[ij][1]/temp_ot[ij][0])
 				if(mean_ot_lst[mct]>=sys.maxsize/100):
 					mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
 					mct+=1
 			mean_ot*=mean_ot_lst[mct]**(1/len(temp_ot))
+			"""
 			print("g_mean: "+str(mean_ot))
 			print("mean: "+str(sum([temp_ot[i][1]/temp_ot[i][0] for i in range(len(temp_ot))])/len(temp_ot)))
 			#print("--------")
