@@ -14,7 +14,7 @@ import numpy as np
 from sd import *
 import sys
 
-
+fig_format=".svg"
 
 temp_lst=[]
 tempc=0
@@ -32,12 +32,15 @@ ct10=0
 ct11=0
 ct12=0
 
-r_var=0
-t_var=0#geometric_mean,mean
-title="g_mean" if t_var==0 else "mean"
-title+="" if r_var==0 else "_r"
 k_var=0#學歷,經濟
 k_type=type_學歷 if k_var==0 else type_經濟
+r_var=0
+t_var=0#geometric_mean,mean
+
+#title="學歷_" if k_var==0 else "經濟_"
+title="g_mean" if t_var==0 else "mean"
+title+="" if r_var==0 else "_r"
+
 
 otct_lst=[[0,0,0] for i in range(len(k_type))]
 #output=[[[] for j in range(len(type_狀態))] for i in range (len(type_學歷))]#[[title,stuff,stuff_type,stuff_value]]
@@ -552,6 +555,7 @@ for i in range(len(output)):
 		y=[e[1] for e in simple_np]
 
 
+		#plt.figure(figsize=(40,30))
 		plt.xlabel("value")
 		plt.ylabel("fine")
 
@@ -562,12 +566,14 @@ for i in range(len(output)):
 		mct=0
 
 		if(t_var!=0):
+			#mean_ot=sum([temp_ot[i][1] for i in range(len(temp_ot))])/len(temp_ot)
 			mean_ot=sum([temp_ot[i][1]/temp_ot[i][0] for i in range(len(temp_ot))])/len(temp_ot)
 		else:
 			mean_ot_ct=1
 			for ij in range(len(temp_ot)):
+				#mean_ot_ct*=(temp_ot[ij][1])
 				mean_ot_ct*=(temp_ot[ij][1]/temp_ot[ij][0])
-				if(mean_ot_ct>=sys.maxsize/200):
+				if(mean_ot_ct>=sys.maxsize/1000):
 					mean_ot*=mean_ot_ct**(1/len(temp_ot))
 					mean_ot_ct=1
 			mean_ot*=mean_ot_ct**(1/len(temp_ot))
@@ -580,6 +586,7 @@ for i in range(len(output)):
 			"""
 			print("g_mean: "+str(mean_ot))
 			print("mean: "+str(sum([temp_ot[i][1]/temp_ot[i][0] for i in range(len(temp_ot))])/len(temp_ot)))
+			#print("mean: "+str(sum([temp_ot[i][1] for i in range(len(temp_ot))])/len(temp_ot)))
 			#print("--------")
 			#print(mct)
 
@@ -587,17 +594,18 @@ for i in range(len(output)):
 		plt.scatter(simple_np[:,0],simple_np[:,1],1,color=color_lst[color_ct])	
 		plt.plot([0,200000/mean_ot],[0,200000],color=color_lst[color_ct])
 		color_ct+=1
+		
 		#plt.plot(x,y)
 		
 		#"""#<--------------[on,off]=[1,2]
 		if(k_var==0):
-			plt.savefig("./fig/學歷_ot3_"+title+".png")
+			plt.savefig("./fig/學歷_ot3_"+title+fig_format)
 		elif(k_var==1):
-			plt.savefig("./fig/經濟_ot3_"+title+".png")
+			plt.savefig("./fig/經濟_ot3_"+title+fig_format)
 		else:
-			plt.savefig("./fig/經濟_ot3_"+title+".png")#undone
+			plt.savefig("./fig/經濟_ot3_"+title+fig_format)#undone
 		"""
-		plt.savefig("./fig/"+("學歷" if k_var==0 else "經濟")+"/"+str(k_type[i])+"_ot3_"+title+".png")
+		plt.savefig("./fig/"+("學歷" if k_var==0 else "經濟")+"/"+str(k_type[i])+"_ot3_"+title+fig_format)
 		plt.clf()
 		#"""
 		#plt.show()
